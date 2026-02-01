@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2025 7L2VKS
-import smbus
+# SPDX-FileCopyrightText: 2025,2026 7L2VKS
+
+from smbus2 import SMBus
 import time
 from enum import Enum, auto
 
@@ -59,7 +60,7 @@ class LCD1602:
     '''
 
     def __init__(self, i2c_address:int, cursor:bool=True, blink:bool=False, backlight:bool=True) -> None:
-        self.bus = smbus.SMBus(1)
+        self.bus = SMBus(1)
         self.i2c_address = i2c_address
         self.backlight = backlight
 
@@ -69,6 +70,13 @@ class LCD1602:
         self.clear_all()                                        # clear all, initialize shift and cursor position
         self.command_display(True, cursor, blink)               # set display(on), cursor, blink state
         self.write_byte(cmd['entry'] | 0x02, rs['cmd'])         # cursor right, data shift off
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+        return False
 
     def write_byte(self, cmd, rs, wait_upper=0.001, wait_lower=0.001):
         k = K if self.backlight else 0
@@ -91,7 +99,7 @@ class LCD1602:
 
     def write_text(self, text:str) -> None:
         '''
-        Write text starting at the cursor position and move the cursor to the
+        Writes text starting at the cursor position and move the cursor to the
         end of the written text. If the cursor is outside the display, the text
         is written starting at the beginning of the current row.
 
@@ -103,7 +111,7 @@ class LCD1602:
 
     def write_bytes(self, btext:bytes) -> None:
         '''
-        Write text in bytes starting at the cursor position and move the cursor
+        Writes text in bytes starting at the cursor position and move the cursor
         to the end of the written text. If the cursor is outside the display,
         the text is written starting at the beginning of the current row.
 
@@ -119,7 +127,7 @@ class LCD1602:
 
     def write_text_at(self, text:str, row:int, col:int=0) -> None:
         '''
-        Write text starting at the specified display position and move the
+        Writes text starting at the specified display position and move the
         cursor to the end of the written text.
 
         Parameters
@@ -139,7 +147,7 @@ class LCD1602:
 
     def write_bytes_at(self, btext:bytes, row:int, col:int=0) -> None:
         '''
-        Write text in bytes starting at the specified display position and move
+        Writes text in bytes starting at the specified display position and move
         the cursor to the end of the written text.
 
         Parameters
@@ -188,8 +196,8 @@ class LCD1602:
     def write_text_alignment(
             self, text:str, row:int, alignment:LCDAlignment=LCDAlignment.LEFT, fill_space:bool=True) -> None:
         '''
-        Write text on the specified row with left, center, or right alignment on
-        the display. The cursor is moved to the end of the written text.
+        Writes text on the specified row with left, center, or right alignment
+        on the display. The cursor is moved to the end of the written text.
 
         Parameters
         ----------
@@ -212,7 +220,7 @@ class LCD1602:
     def write_bytes_alignment(
             self, btext:bytes, row:int, alignment:LCDAlignment=LCDAlignment.LEFT, fill_space:bool=True) -> None:
         '''
-        Write text in bytes on the specified row with left, center, or right
+        Writes text in bytes on the specified row with left, center, or right
         alignment on the display. The cursor is moved to the end of the written
         text.
 
@@ -257,7 +265,7 @@ class LCD1602:
 
     def write_text_buffer(self, text:str) -> None:
         '''
-        Write text starting at the cursor position and move the cursor to the
+        Writes text starting at the cursor position and move the cursor to the
         end of the written text.
 
         Parameters
@@ -268,7 +276,7 @@ class LCD1602:
 
     def write_bytes_buffer(self, btext:bytes) -> None:
         '''
-        Write text in bytes starting at the cursor position and move the cursor
+        Writes text in bytes starting at the cursor position and move the cursor
         to the end of the written text.
 
         Parameters
@@ -280,8 +288,8 @@ class LCD1602:
 
     def write_text_buffer_at(self, text:str, row:int, col:int=0) -> None:
         '''
-        Write text starting at the specified buffer position and move the cursor
-        to the end of the written text.
+        Writes text starting at the specified buffer position and move the
+        cursor to the end of the written text.
 
         Parameters
         ----------
@@ -300,7 +308,7 @@ class LCD1602:
 
     def write_bytes_buffer_at(self, btext:bytes, row:int, col:int=0) -> None:
         '''
-        Write text in bytes starting at the specified buffer position and move
+        Writes text in bytes starting at the specified buffer position and move
         the cursor to the end of the written text.
 
         Parameters
@@ -335,7 +343,7 @@ class LCD1602:
 
     def clear_all(self) -> None:
         '''
-        Clear the entire buffer by filling it with space characters, reset the
+        Clears the entire buffer by filling it with space characters, reset the
         buffer position to its initial state, and set the cursor to the top-left
         corner of the display.
         '''
@@ -346,7 +354,7 @@ class LCD1602:
 
     def clear_row(self, row:int) -> None:
         '''
-        Clear the display of the specified row by filling it with space
+        Clears the display of the specified row by filling it with space
         characters, and set the cursor to the beginning of that row.
 
         Parameters
@@ -364,7 +372,7 @@ class LCD1602:
 
     def clear(self, row:int, col:int=0, length:int=0) -> None:
         '''
-        Clear a specified length in the display by overwriting it with space
+        Clears a specified length in the display by overwriting it with space
         characters, starting at the specified display position. Then move the
         cursor to the end of the written space characters.
 
@@ -394,7 +402,7 @@ class LCD1602:
 
     def clear_row_buffer(self, row:int) -> None:
         '''
-        Clear the buffer of the specified row by filling it with space
+        Clears the buffer of the specified row by filling it with space
         characters, reset the buffer position to its initial state, and set the
         cursor to the beginning of that row.
 
@@ -413,7 +421,7 @@ class LCD1602:
 
     def clear_buffer(self, row:int, col:int=0, length:int=0) -> None:
         '''
-        Clear a specified length in the buffer by overwriting it with space
+        Clears a specified length in the buffer by overwriting it with space
         characters, starting at the specified buffer position. Then move the
         cursor to the end of the written space characters.
 
@@ -443,7 +451,7 @@ class LCD1602:
 
     def set_home(self) -> None:
         '''
-        Reset the buffer position to its initial state, and set the cursor to
+        Resets the buffer position to its initial state, and set the cursor to
         the top-left corner of the display.
         '''
         self.write_byte(cmd['home'], rs['cmd'], wait_lower=0.002)
@@ -453,7 +461,7 @@ class LCD1602:
 
     def set_cursor_home(self, row:int=0) -> None:
         '''
-        Set the cursor to the beginning of the specified row.
+        Sets the cursor to the beginning of the specified row.
 
         Parameters
         ----------
@@ -469,7 +477,7 @@ class LCD1602:
 
     def set_cursor(self, row:int, col:int=0) -> None:
         '''
-        Set the cursor to the specified display position.
+        Sets the cursor to the specified display position.
 
         Parameters
         ----------
@@ -493,13 +501,14 @@ class LCD1602:
 
     def move_cursor(self, offset:int=1) -> None:
         '''
-        Move the cursor by the specified amount. If the cursor goes off the display,
-        it will stay at the left or right edge of the display.
+        Moves the cursor by the specified amount. If the cursor goes off the
+        display, it will stay at the left or right edge of the display.
 
         Parameters
         ----------
         offset : int
-            Positive values move to the right, and negative values move to the left.
+            Positive values move to the right, and negative values move to the
+            left.
         '''
         col = (self.col - self.shift + offset) % BUFF_SIZE
         if col >= LCD_COLS:
@@ -508,7 +517,7 @@ class LCD1602:
 
     def set_buffer_home(self, row:int=0) -> None:
         '''
-        Reset the buffer position to its initial state, and set the cursor to
+        Resets the buffer position to its initial state, and set the cursor to
         the beginning of the specified row.
 
         Parameters
@@ -526,7 +535,7 @@ class LCD1602:
 
     def set_cursor_buffer(self, row:int, col:int=0) -> None:
         '''
-        Set the cursor to the specified buffer position.
+        Sets the cursor to the specified buffer position.
 
         Parameters
         ----------
@@ -553,7 +562,7 @@ class LCD1602:
 
     def move_cursor_buffer(self, offset:int=1) -> None:
         '''
-        Move the cursor by the specified amount.
+        Moves the cursor by the specified amount.
 
         Parameters
         ----------
@@ -564,7 +573,7 @@ class LCD1602:
 
     def set_buffer(self, col:int=0) -> None:
         '''
-        Shift the specified buffer position to the left edge of the display.
+        Shifts the specified buffer position to the left edge of the display.
 
         Parameters
         ----------
@@ -583,12 +592,13 @@ class LCD1602:
 
     def move_buffer(self, offset:int=1) -> None:
         '''
-        Shift the buffer by the specified amount.
+        Shifts the buffer by the specified amount.
 
         Parameters
         ----------
         offset : int
-            Positive values shift to the left, and negative values shift to the right.
+            Positive values shift to the left, and negative values shift to the
+            right.
         '''
         direction = 0x04 if offset < 0 else 0x00
         amount = abs(offset) % BUFF_SIZE
@@ -599,7 +609,7 @@ class LCD1602:
 
     def set_display(self, enabled:bool=True) -> None:
         '''
-        Turn the display on or off.
+        Turns the display on or off.
 
         Parameters
         ----------
@@ -610,7 +620,7 @@ class LCD1602:
 
     def set_backlight(self, enabled:bool=True) -> None:
         '''
-        Turn the backlight on or off.
+        Turns the backlight on or off.
 
         Parameters
         ----------
@@ -622,7 +632,7 @@ class LCD1602:
 
     def set_cursor_attribute(self, show:bool=True, blink:bool=False) -> None:
         '''
-        Set the cursor visibility and blinking state.
+        Sets the cursor visibility and blinking state.
 
         Parameters
         ----------
@@ -635,7 +645,7 @@ class LCD1602:
 
     def turn_off(self) -> None:
         '''
-        Turn off the backlight, disable the display and cursor, and clear the
+        Turns off the backlight, disable the display and cursor, and clear the
         buffer.
         '''
         self.set_backlight(False)                               # backlight off
@@ -644,7 +654,7 @@ class LCD1602:
 
     def register_pattern(self, char_code:int, pattern:list) -> None:
         '''
-        Register a custom font pattern into CGRAM.
+        Registers a custom font pattern into CGRAM.
 
         Parameters
         ----------
@@ -673,7 +683,7 @@ class LCD1602:
 
     def clear_pattern(self, char_code:int) -> None:
         '''
-        Clear the custom font pattern registered in CGRAM.
+        Clears the custom font pattern registered in CGRAM.
 
         Parameters
         ----------
@@ -689,7 +699,7 @@ class LCD1602:
 
     def get_row_count(self) -> int:
         '''
-        Return the number of display rows.
+        Returns the number of display rows.
 
         Returns
         -------
@@ -700,7 +710,7 @@ class LCD1602:
 
     def get_col_count(self) -> int:
         '''
-        Return the number of display columns.
+        Returns the number of display columns.
 
         Returns
         -------
@@ -711,7 +721,7 @@ class LCD1602:
 
     def get_buffer_length(self) -> int:
         '''
-        Return the buffer length per row.
+        Returns the buffer length per row.
 
         Returns
         -------
@@ -722,7 +732,8 @@ class LCD1602:
 
     def get_cursor(self) -> tuple[int, int]:
         '''
-        Return the current cursor position on the display as a (row, col) tuple.
+        Returns the current cursor position on the display as a (row, col)
+        tuple.
 
         Returns
         -------
@@ -737,7 +748,7 @@ class LCD1602:
 
     def get_cursor_buffer(self) -> tuple[int, int]:
         '''
-        Return the current cursor position on the buffer as a (row, col) tuple.
+        Returns the current cursor position on the buffer as a (row, col) tuple.
 
         Returns
         -------
@@ -749,7 +760,7 @@ class LCD1602:
 
     def get_buffer(self) -> int:
         '''
-        Return the buffer position on the left edge of the display.
+        Returns the buffer position on the left edge of the display.
 
         Returns
         -------
@@ -758,9 +769,15 @@ class LCD1602:
         '''
         return self.shift
 
+    def close(self) -> None:
+        '''
+        Closes the I2C bus connection.
+        '''
+        self.bus.close()
+
     def demo(self) -> None:
         '''
-        Fill the entire buffer with sample text for demonstration purposes.
+        Fills the entire buffer with sample text for demonstration purposes.
         '''
         self.write_bytes_buffer_at(bytes(range(0x40, 0x68)), 0)
         self.write_text_buffer_at('0....+....1....+....2....+....3....+....', 1)

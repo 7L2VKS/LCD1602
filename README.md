@@ -1,4 +1,4 @@
-# LCD1602 I2C Python Library
+# LCD1602 I2C Python Library - lcd1602
 
 A Python library for operating an LCD1602 (16 x 2 character display) device over an I2C interface. This library has been confirmed to work on Raspberry Pi 3 model B and 5.
 
@@ -10,8 +10,13 @@ The LCD1602 display consists of 2 rows x 16 columns, backed by a 40-character bu
 
 5 x 8 dot custom fonts may be registered in CGRAM using character codes in the range 0x00 to 0x07.
 
-* **`LCD1602.py`**: The main class for the device control.
-* **`LCDDemo.py`**: Sample and demo script for using this library.
+## Installation
+
+You can install this library directly from GitHub using `pip`. The dependency (`smbus2`) will be installed automatically.
+
+```bash
+pip install git+https://github.com/7L2VKS/LCD1602.git
+```
 
 ## Preparation
 
@@ -30,24 +35,11 @@ Connect I2C module on the LCD1602 to your Raspberry Pi using the following pin m
 | **SDA** | GPIO 2 (SDA, Pin 3) | I2C Data |
 | **SCL** | GPIO 3 (SCL, Pin 5) | I2C Clock |
 
-### 3. Install Dependencies
-This library requires the `smbus2` package for I2C communication. It is usually installed by default on Raspberry Pi OS, but if it is not, install it with the following command.
-
-```bash
-pip install smbus2
-```
-
-### 4. Identify I2C Address
-
-If you don't have it installed, install `i2c-tools`:
+### 3. Identify I2C Address
+Ensure i2c-tools is installed:
 
 ```bash
 sudo apt install i2c-tools
-```
-
-Run the following command to find the address of your device:
-
-```bash
 i2cdetect -y 1
 ```
 
@@ -55,10 +47,10 @@ The hex value shown in the table (e.g. `27`) is the I2C address.
 
 ## Quick Start
 
-Place `LCD1602.py` in your project directory and run the following in Python REPL:
+In a Python REPL, run:
 
 ```python
->>> from LCD1602 import LCD1602
+>>> from lcd1602 import LCD1602
 >>> # Replace 0x27 with the address from i2cdetect
 >>> with LCD1602(0x27) as lcd:
 ...     lcd.demo()
@@ -67,6 +59,7 @@ Place `LCD1602.py` in your project directory and run the following in Python REP
 Alternatively, run the demo script to see various features in action. Before running it, change the I2C address in the script to the address you confirmed in the step above.
 
 ```bash
+curl -O https://raw.githubusercontent.com/7L2VKS/LCD1602/main/LCDDemo.py
 python LCDDemo.py
 ```
 

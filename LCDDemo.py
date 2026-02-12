@@ -1,6 +1,6 @@
 # LCD1602 demo (sample code how to use LCD1602 class)
 
-from LCD1602 import LCD1602, LCDAlignment
+from lcd1602 import LCD1602, LCDAlignment
 from time import sleep
 
 COLS = 16
